@@ -744,9 +744,9 @@ body {
 
 .lumpsum-item {
     display: grid;
-    grid-template-columns: 1fr 2fr auto;
+    grid-template-columns: 1fr 1fr 1.5fr auto;
     gap: var(--spacing-sm);
-    align-items: center;
+    align-items: end;
     padding: var(--spacing-sm);
     background: var(--bg-elevated);
     border: 1px solid var(--border-color);
@@ -779,7 +779,9 @@ body {
     letter-spacing: 0.5px;
 }
 
-.lumpsum-input {
+.lumpsum-input,
+.lumpsum-month-select,
+.lumpsum-year-select {
     padding: var(--spacing-sm);
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -790,7 +792,14 @@ body {
     transition: all var(--transition-base);
 }
 
-.lumpsum-input:focus {
+.lumpsum-month-select,
+.lumpsum-year-select {
+    cursor: pointer;
+}
+
+.lumpsum-input:focus,
+.lumpsum-month-select:focus,
+.lumpsum-year-select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px var(--primary-glow);

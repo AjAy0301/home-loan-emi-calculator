@@ -170,10 +170,31 @@ function addLumpsumPayment(month = '', amount = '') {
     item.className = 'lumpsum-item';
     item.dataset.id = id;
 
+    // Generate year options (loan start year to 30 years ahead)
+    const startYear = calculatorState.startYear;
+    const endYear = startYear + 30;
+    let yearOptions = '';
+    for (let year = startYear; year <= endYear; year++) {
+        yearOptions += `<option value="${year}">${year}</option>`;
+    }
+
+    // Month options
+    const monthOptions = monthNamesFull.map((name, idx) => {
+        return `<option value="${idx}">${name}</option>`;
+    }).join('');
+
     item.innerHTML = `
         <div class="lumpsum-input-group">
             <label class="lumpsum-label">Month</label>
-            <input type="number" class="lumpsum-input lumpsum-month" min="1" max="360" value="${month}" placeholder="Month #">
+            <select class="lumpsum-input lumpsum-month-select">
+                ${monthOptions}
+            </select>
+        </div>
+        <div class="lumpsum-input-group">
+            <label class="lumpsum-label">Year</label>
+            <select class="lumpsum-input lumpsum-year-select">
+                ${yearOptions}
+            </select>
         </div>
         <div class="lumpsum-input-group">
             <label class="lumpsum-label">Amount</label>
@@ -190,11 +211,13 @@ function addLumpsumPayment(month = '', amount = '') {
     elements.lumpsumList.appendChild(item);
 
     // Add event listeners
-    const monthInput = item.querySelector('.lumpsum-month');
+    const monthSelect = item.querySelector('.lumpsum-month-select');
+    const yearSelect = item.querySelector('.lumpsum-year-select');
     const amountInput = item.querySelector('.lumpsum-amount');
     const removeBtn = item.querySelector('.remove-lumpsum-btn');
 
-    monthInput.addEventListener('change', updateLumpsumPayments);
+    monthSelect.addEventListener('change', updateLumpsumPayments);
+    yearSelect.addEventListener('change', updateLumpsumPayments);
     amountInput.addEventListener('change', updateLumpsumPayments);
 
     removeBtn.addEventListener('click', () => {
@@ -208,11 +231,24 @@ function updateLumpsumPayments() {
     calculatorState.lumpsumPayments = [];
 
     items.forEach(item => {
-        const month = parseInt(item.querySelector('.lumpsum-month').value);
-        const amount = parseInt(item.querySelector('.lumpsum-amount').value);
+        const monthSelect = item.querySelector('.lumpsum-month-select');
+        const yearSelect = item.querySelector('.lumpsum-year-select');
+        const amountInput = item.querySelector('.lumpsum-amount');
 
-        if (month > 0 && amount > 0) {
-            calculatorState.lumpsumPayments.push({ month, amount });
+        const paymentMonth = parseInt(monthSelect.value);
+        const paymentYear = parseInt(yearSelect.value);
+        const amount = parseInt(amountInput.value);
+
+        if (amount > 0) {
+            // Calculate which month number this is from loan start
+            const startMonthTotal = calculatorState.startYear * 12 + calculatorState.startMonth;
+            const paymentMonthTotal = paymentYear * 12 + paymentMonth;
+            const monthNumber = paymentMonthTotal - startMonthTotal + 1;
+
+            // Only add if the payment is after loan start
+            if (monthNumber > 0) {
+                calculatorState.lumpsumPayments.push({ month: monthNumber, amount });
+            }
         }
     });
 
