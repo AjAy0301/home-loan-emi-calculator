@@ -1,26 +1,26 @@
 /* ===== CSS VARIABLES & DESIGN TOKENS ===== */
 :root {
-    /* Color Palette - Vibrant & Modern */
-    --primary-hue: 250;
-    --primary-color: hsl(var(--primary-hue), 85%, 60%);
-    --primary-light: hsl(var(--primary-hue), 85%, 70%);
-    --primary-dark: hsl(var(--primary-hue), 85%, 50%);
-    --primary-glow: hsla(var(--primary-hue), 85%, 60%, 0.4);
+    /* Professional Blue/Teal Color Scheme */
+    --primary-hue: 200;
+    --primary-color: hsl(200, 90%, 48%);
+    --primary-light: hsl(200, 90%, 58%);
+    --primary-dark: hsl(200, 90%, 38%);
+    --primary-glow: hsla(200, 90%, 50%, 0.35);
 
-    --secondary-hue: 200;
-    --secondary-color: hsl(var(--secondary-hue), 80%, 55%);
-    --secondary-light: hsl(var(--secondary-hue), 80%, 65%);
+    --secondary-hue: 210;
+    --secondary-color: hsl(210, 75%, 50%);
+    --secondary-light: hsl(210, 75%, 60%);
 
-    --accent-hue: 330;
-    --accent-color: hsl(var(--accent-hue), 75%, 60%);
-    --accent-light: hsl(var(--accent-hue), 75%, 70%);
+    --accent-hue: 185;
+    --accent-color: hsl(185, 80%, 48%);
+    --accent-light: hsl(185, 80%, 58%);
 
-    /* Background Colors */
-    --bg-primary: hsl(240, 15%, 8%);
-    --bg-secondary: hsl(240, 12%, 12%);
-    --bg-elevated: hsl(240, 12%, 15%);
-    --bg-card: hsla(240, 12%, 18%, 0.6);
-    --bg-input: hsla(240, 10%, 20%, 0.8);
+    /* Background Colors - Professional Dark */
+    --bg-primary: hsl(210, 22%, 9%);
+    --bg-secondary: hsl(210, 20%, 12%);
+    --bg-elevated: hsl(210, 20%, 16%);
+    --bg-card: hsla(210, 20%, 18%, 0.7);
+    --bg-input: hsla(210, 18%, 20%, 0.85);
 
     /* Text Colors */
     --text-primary: hsl(0, 0%, 98%);
@@ -28,20 +28,20 @@
     --text-tertiary: hsl(0, 0%, 50%);
 
     /* Border & Divider */
-    --border-color: hsla(240, 10%, 30%, 0.3);
-    --border-hover: hsla(240, 10%, 40%, 0.5);
+    --border-color: hsla(210, 15%, 28%, 0.4);
+    --border-hover: hsla(200, 60%, 45%, 0.6);
 
     /* Glassmorphism */
-    --glass-bg: hsla(240, 12%, 20%, 0.4);
-    --glass-border: hsla(240, 10%, 50%, 0.2);
+    --glass-bg: hsla(210, 18%, 22%, 0.5);
+    --glass-border: hsla(200, 45%, 50%, 0.25);
 
-    /* Shadows */
-    --shadow-sm: 0 2px 8px hsla(0, 0%, 0%, 0.1);
-    --shadow-md: 0 4px 16px hsla(0, 0%, 0%, 0.15);
-    --shadow-lg: 0 8px 32px hsla(0, 0%, 0%, 0.2);
-    --shadow-xl: 0 16px 48px hsla(0, 0%, 0%, 0.25);
-    --glow-primary: 0 0 20px var(--primary-glow);
-    --glow-accent: 0 0 20px hsla(var(--accent-hue), 75%, 60%, 0.3);
+    /* Shadows - More Pronounced */
+    --shadow-sm: 0 2px 10px hsla(0, 0%, 0%, 0.2);
+    --shadow-md: 0 4px 20px hsla(0, 0%, 0%, 0.3);
+    --shadow-lg: 0 8px 36px hsla(0, 0%, 0%, 0.4);
+    --shadow-xl: 0 16px 56px hsla(0, 0%, 0%, 0.5);
+    --glow-primary: 0 0 24px var(--primary-glow), 0 0 12px var(--primary-glow);
+    --glow-accent: 0 0 24px hsla(185, 80%, 48%, 0.35), 0 0 12px hsla(185, 80%, 48%, 0.25);
 
     /* Spacing */
     --spacing-xs: 0.5rem;
