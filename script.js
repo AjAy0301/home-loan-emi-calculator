@@ -340,6 +340,9 @@ function calculateEMI() {
     // Update donut chart
     updateDonutChart(principalPercent, interestPercent);
 
+    // Update dashboard charts
+    updateDashboardCharts();
+
     // Display schedule
     displaySchedule('yearly');
 }
@@ -813,3 +816,292 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ===== DASHBOARD CHARTS =====
+function renderBalanceChart() {
+    const canvas = document.getElementById('balance-canvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const schedule = calculatorState.schedule;
+
+    if (schedule.length === 0) return;
+
+    // Set canvas size with device pixel ratio for crisp rendering
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const width = rect.width;
+    const height = rect.height;
+    const padding = 40;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+
+    // Find max balance for scaling
+    const maxBalance = calculatorState.loanAmount;
+
+    // Sample data points (take every Nth point to avoid overcrowding)
+    const sampleRate = Math.max(1, Math.floor(schedule.length / 50));
+    const dataPoints = schedule.filter((_, i) => i % sampleRate === 0 || i === schedule.length - 1);
+
+    // Draw grid lines
+    ctx.strokeStyle = 'rgba(100, 150, 200, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+        const y = padding + (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+    }
+
+    // Draw axes
+    ctx.strokeStyle = 'rgba(100, 180, 220, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, height - padding);
+    ctx.lineTo(width - padding, height - padding);
+    ctx.stroke();
+
+    // Draw area under curve (fill)
+    const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+    gradient.addColorStop(0, 'rgba(0, 150, 255, 0.3)');
+    gradient.addColorStop(1, 'rgba(0, 200, 255, 0.05)');
+
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.moveTo(padding, height - padding);
+
+    dataPoints.forEach((point, i) => {
+        const x = padding + (i / (dataPoints.length - 1)) * chartWidth;
+        const y = height - padding - (point.balance / maxBalance) * chartHeight;
+        if (i === 0) {
+            ctx.lineTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+
+    ctx.lineTo(width - padding, height - padding);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw line
+    ctx.strokeStyle = '#00aaff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    dataPoints.forEach((point, i) => {
+        const x = padding + (i / (dataPoints.length - 1)) * chartWidth;
+        const y = height - padding - (point.balance / maxBalance) * chartHeight;
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+
+    ctx.stroke();
+
+    // Draw Y-axis labels
+    ctx.fillStyle = '#a0a0b0';
+    ctx.font = '11px Inter';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+        const value = maxBalance * (1 - i / 5);
+        const y = padding + (chartHeight / 5) * i;
+        const label = value >= 10000000 ? `₹${(value / 10000000).toFixed(1)}Cr` :
+            value >= 100000 ? `₹${(value / 100000).toFixed(0)}L` :
+                `₹${(value / 1000).toFixed(0)}K`;
+        ctx.fillText(label, padding - 8, y + 4);
+    }
+
+    // Draw X-axis labels (years)
+    ctx.textAlign = 'center';
+    const years = Math.ceil(schedule.length / 12);
+    const labelCount = Math.min(6, years);
+    for (let i = 0; i <= labelCount; i++) {
+        const x = padding + (i / labelCount) * chartWidth;
+        const year = Math.floor((i / labelCount) * years);
+        ctx.fillText(`${year}Y`, x, height - padding + 20);
+    }
+}
+
+function renderPaymentChart() {
+    const canvas = document.getElementById('payment-canvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const schedule = calculatorState.schedule;
+
+    if (schedule.length === 0) return;
+
+    // Set canvas size
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const width = rect.width;
+    const height = rect.height;
+    const padding = 40;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+
+    // Group by year
+    const years = Math.ceil(schedule.length / 12);
+    const yearlyData = [];
+
+    for (let year = 1; year <= years; year++) {
+        const startMonth = (year - 1) * 12;
+        const endMonth = Math.min(year * 12, schedule.length);
+
+        let yearPrincipal = 0;
+        let yearInterest = 0;
+
+        for (let i = startMonth; i < endMonth; i++) {
+            yearPrincipal += schedule[i].principal;
+            yearInterest += schedule[i].interest;
+        }
+
+        yearlyData.push({ year, principal: yearPrincipal, interest: yearInterest });
+    }
+
+    // Sample data if too many years
+    const displayData = years > 15 ? yearlyData.filter((_, i) => i % 2 === 0) : yearlyData;
+    const maxValue = Math.max(...displayData.map(d => d.principal + d.interest));
+
+    // Draw grid
+    ctx.strokeStyle = 'rgba(100, 150, 200, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+        const y = padding + (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+    }
+
+    // Draw axes
+    ctx.strokeStyle = 'rgba(100, 180, 220, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, height - padding);
+    ctx.lineTo(width - padding, height - padding);
+    ctx.stroke();
+
+    // Draw bars
+    const barWidth = Math.min(30, chartWidth / (displayData.length * 2.5));
+    const spacing = barWidth * 0.3;
+
+    displayData.forEach((data, i) => {
+        const x = padding + (i + 0.5) * (chartWidth / displayData.length);
+        const totalHeight = ((data.principal + data.interest) / maxValue) * chartHeight;
+        const principalHeight = (data.principal / maxValue) * chartHeight;
+        const interestHeight = (data.interest / maxValue) * chartHeight;
+
+        // Principal bar
+        const principalGradient = ctx.createLinearGradient(0, height - padding - principalHeight, 0, height - padding);
+        principalGradient.addColorStop(0, '#00a8ff');
+        principalGradient.addColorStop(1, '#0088cc');
+
+        ctx.fillStyle = principalGradient;
+        ctx.fillRect(
+            x - barWidth / 2,
+            height - padding - principalHeight,
+            barWidth,
+            principalHeight
+        );
+
+        // Interest bar (stacked on top)
+        const interestGradient = ctx.createLinearGradient(0, height - padding - totalHeight, 0, height - padding - principalHeight);
+        interestGradient.addColorStop(0, '#ff6b6b');
+        interestGradient.addColorStop(1, '#ee5555');
+
+        ctx.fillStyle = interestGradient;
+        ctx.fillRect(
+            x - barWidth / 2,
+            height - padding - totalHeight,
+            barWidth,
+            interestHeight
+        );
+
+        // Add subtle border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(
+            x - barWidth / 2,
+            height - padding - totalHeight,
+            barWidth,
+            totalHeight
+        );
+    });
+
+    // Y-axis labels
+    ctx.fillStyle = '#a0a0b0';
+    ctx.font = '11px Inter';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+        const value = maxValue * (1 - i / 5);
+        const y = padding + (chartHeight / 5) * i;
+        const label = value >= 10000000 ? `₹${(value / 10000000).toFixed(1)}Cr` :
+            value >= 100000 ? `₹${(value / 100000).toFixed(0)}L` :
+                `₹${(value / 1000).toFixed(0)}K`;
+        ctx.fillText(label, padding - 8, y + 4);
+    }
+
+    // X-axis labels
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#a0a0b0';
+    displayData.forEach((data, i) => {
+        const x = padding + (i + 0.5) * (chartWidth / displayData.length);
+        ctx.fillText(`Y${data.year}`, x, height - padding + 20);
+    });
+
+    // Legend
+    const legendY = 15;
+    const legendX = width - padding - 120;
+
+    ctx.fillStyle = '#00a8ff';
+    ctx.fillRect(legendX, legendY, 12, 12);
+    ctx.fillStyle = '#a0a0b0';
+    ctx.font = '11px Inter';
+    ctx.textAlign = 'left';
+    ctx.fillText('Principal', legendX + 18, legendY + 10);
+
+    ctx.fillStyle = '#ff6b6b';
+    ctx.fillRect(legendX + 75, legendY, 12, 12);
+    ctx.fillStyle = '#a0a0b0';
+    ctx.fillText('Interest', legendX + 93, legendY + 10);
+}
+
+// Update charts after calculation
+function updateDashboardCharts() {
+    setTimeout(() => {
+        renderBalanceChart();
+        renderPaymentChart();
+    }, 300);
+}
+
+// Re-render charts on window resize
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        renderBalanceChart();
+        renderPaymentChart();
+    }, 250);
+});
+

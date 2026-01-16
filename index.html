@@ -342,6 +342,52 @@
             </div>
         </div>
 
+        <!-- Visual Dashboard Section -->
+        <div class="dashboard-section">
+            <h2 class="dashboard-title">
+                <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"></path>
+                    <path d="M18 17V9"></path>
+                    <path d="M13 17V5"></path>
+                    <path d="M8 17v-3"></path>
+                </svg>
+                Visual Analytics Dashboard
+            </h2>
+
+            <div class="dashboard-grid">
+                <!-- Balance Reduction Chart -->
+                <div class="card dashboard-card">
+                    <h3 class="dashboard-card-title">
+                        <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Loan Balance Over Time
+                    </h3>
+                    <div class="balance-chart-container" id="balance-chart">
+                        <canvas id="balance-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Principal vs Interest Bar Chart -->
+                <div class="card dashboard-card">
+                    <h3 class="dashboard-card-title">
+                        <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 3v18h18"></path>
+                            <path d="M18 17V9"></path>
+                            <path d="M13 17V5"></path>
+                            <path d="M8 17v-3"></path>
+                        </svg>
+                        Yearly Payment Breakdown
+                    </h3>
+                    <div class="bar-chart-container" id="payment-chart">
+                        <canvas id="payment-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Amortization Schedule -->
         <div class="card schedule-card">
             <div class="schedule-header">

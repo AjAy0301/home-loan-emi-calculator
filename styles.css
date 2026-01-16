@@ -1092,8 +1092,100 @@ body {
     }
 }
 
+/* ===== DASHBOARD SECTION ===== */
+.dashboard-section {
+    margin: var(--spacing-2xl) 0;
+    animation: fadeInUp 0.8s ease 0.3s both;
+}
+
+.dashboard-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xl);
+    color: var(--text-primary);
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dashboard-icon {
+    width: 2rem;
+    height: 2rem;
+    stroke: var(--primary-color);
+    filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-card {
+    min-height: 350px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-base);
+}
+
+.dashboard-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-xl), 0 0 30px var(--primary-glow);
+    transform: translateY(-3px);
+}
+
+.dashboard-card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-secondary);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: var(--accent-color);
+}
+
+.balance-chart-container,
+.bar-chart-container {
+    position: relative;
+    height: 280px;
+    padding: var(--spacing-md) 0;
+}
+
+#balance-canvas,
+#payment-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: var(--radius-md);
+}
+
+/* ===== RESPONSIVE IMPROVEMENTS ===== */
+@media (max-width: 1200px) {
+    .calculator-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 1024px) {
+@media (max-width: 992px) {
     .calculator-grid {
         grid-template-columns: 1fr;
     }
